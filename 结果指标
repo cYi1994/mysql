@@ -1,0 +1,132 @@
+SET @date1 = '2017-07-01';
+SET @date2 = '2017-07-20';
+
+SELECT count(n.`ID`) as '成单总数',
+				sum(n.`成单金额`) as '成单总金额',
+				count(distinct n.`销售姓名`) as '成单总人次',
+				sum(n.`成单金额`)/count(n.`ID`) as '单均金额'
+FROM
+(SELECT DISTINCT o.pid as 'ID',
+                from_unixtime(o.update_time) as '成单时间',
+                o.name as '成单内容',
+                o.student_user_id as '学生ID',
+                o.planner_name as '销售姓名',
+								p.role as '大区',
+								p.status as '状态',
+                o.lesson_num as '课时数',
+                o.amount/100 as '成单金额',
+                o.original_amount/100 as '原价',
+								o.out_trade_no as '支付No',
+                o.note as '备注'
+FROM series_order o
+left join crm_personnel p on p.content = o.planner_name
+WHERE date_format(from_unixtime(o.update_time), '%Y-%m-%d') between @date1 and @date2
+  AND (o.note NOT LIKE '%zyb%')
+  AND (o.name NOT LIKE '%测试%')
+  AND (o.name NOT LIKE '%test%')
+  and o.status ='SUCCESS'
+  AND o.amount/100>100
+  AND o.student_user_id NOT IN (148811250,
+                              141321906,
+                              141321906,
+                              43744461,
+                              250595181,
+                              141321906,
+                              249450013,
+                              250595219,
+                              248444058,
+                              248259226,
+                              251804322,
+                              251804626,
+                              251804835,
+                              251436121,
+                              75462035,
+                              247444506)
+) as n;
+
+
+SELECT left(n.`大区`,2),
+				count(n.`ID`) as '成单总数',
+				sum(n.`成单金额`) as '成单总金额',
+				count(distinct n.`销售姓名`) as '成单总人次',
+				sum(n.`成单金额`)/count(n.`ID`) as '单均金额'
+FROM
+(SELECT DISTINCT o.pid as 'ID',
+                from_unixtime(o.update_time) as '成单时间',
+                o.name as '成单内容',
+                o.student_user_id as '学生ID',
+                o.planner_name as '销售姓名',
+								p.role as '大区',
+								p.status as '状态',
+                o.lesson_num as '课时数',
+                o.amount/100 as '成单金额',
+                o.original_amount/100 as '原价',
+								o.out_trade_no as '支付No',
+                o.note as '备注'
+FROM series_order o
+left join crm_personnel p on p.content = o.planner_name
+WHERE date_format(from_unixtime(o.update_time), '%Y-%m-%d') between @date1 and @date2
+  AND (o.note NOT LIKE '%zyb%')
+  AND (o.name NOT LIKE '%测试%')
+  AND (o.name NOT LIKE '%test%')
+  and o.status ='SUCCESS'
+  AND o.amount/100>100
+  AND o.student_user_id NOT IN (148811250,
+                              141321906,
+                              141321906,
+                              43744461,
+                              250595181,
+                              141321906,
+                              249450013,
+                              250595219,
+                              248444058,
+                              248259226,
+                              251804322,
+                              251804626,
+                              251804835,
+                              251436121,
+                              75462035,
+                              247444506)
+) as n
+group by left(n.`大区`,2)
+order by left(n.`大区`,2);
+
+
+
+SELECT DISTINCT o.pid as 'ID',
+                from_unixtime(o.update_time) as '成单时间',
+                o.name as '成单内容',
+                o.student_user_id as '学生ID',
+                o.planner_name as '销售姓名',
+								p.role as '大区',
+								p.status as '状态',
+                o.lesson_num as '课时数',
+                o.amount/100 as '成单金额',
+                o.original_amount/100 as '原价',
+								o.out_trade_no as '支付No',
+                o.note as '备注'
+FROM series_order o
+left join crm_personnel p on p.content = o.planner_name
+WHERE date_format(from_unixtime(o.update_time), '%Y-%m-%d') between @date1 and @date2
+  AND (o.note NOT LIKE '%zyb%')
+  AND (o.name NOT LIKE '%测试%')
+  AND (o.name NOT LIKE '%test%')
+  and o.status ='SUCCESS'
+  AND o.amount/100>100
+  AND o.student_user_id NOT IN (148811250,
+                              141321906,
+                              141321906,
+                              43744461,
+                              250595181,
+                              141321906,
+                              249450013,
+                              250595219,
+                              248444058,
+                              248259226,
+                              251804322,
+                              251804626,
+                              251804835,
+                              251436121,
+                              75462035,
+                              247444506)											
+order by from_unixtime(o.update_time)
