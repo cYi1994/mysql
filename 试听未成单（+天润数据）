@@ -1,0 +1,32 @@
+SELECT b.telephone_num as '学生电话',
+				b.user_name as 'User Name',
+				b.equip_info,
+				b.`subject`,
+				n1.client_name as '咨询师姓名',
+				n1.source,
+				from_unixtime(b.end_time/1000) as '试听结束时间',
+				from_unixtime(MIN(n1.start_time)) as '试听后首次跟进时间',
+				sec_to_time(MIN(n1.start_time) - b.end_time/1000) as '跟进时效',
+				count(n1.`status`) as '试听后呼出总数',
+				sum(if(n1.`status` = 28, 1, 0)) as '接听次数'
+FROM preorder_but_no_order b
+JOIN(
+		SELECT c1.customer_number,
+				c1.client_name,
+				c2.source,
+				c1.`start_time`,
+				c1.`status`
+		FROM crm_call_outcome_record c1
+		LEFT JOIN (SELECT j.telephone_number, j.source
+					FROM crm_form_record j
+					WHERE j.source NOT LIKE 'FROM%'
+					GROUP BY j.telephone_number
+					HAVING MAX(j.create_time)) as c2
+		ON c1.customer_number = c2.telephone_number
+) as n1
+ON b.telephone_num = n1.customer_number
+WHERE n1.start_time > (b.end_time/1000)
+	AND b.user_name NOT LIKE '测试%'
+	AND date_format(from_unixtime(b.end_time/1000), '%Y-%m-%d') BETWEEN '2017-06-01' AND '2017-07-13'
+GROUP BY b.telephone_num, n1.client_name
+ORDER BY b.end_time, `跟进时效`
