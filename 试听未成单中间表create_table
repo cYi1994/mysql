@@ -1,0 +1,8 @@
+create table preorder_but_no_order(
+				student_user_id BIGINT(20) NOT NULL,
+				user_name VARCHAR(128),
+				telephone_num BIGINT(20) NOT NULL,
+				subject TINYINT(2),
+				end_time BIGINT(20),
+				PRIMARY KEY(student_user_id)
+)
