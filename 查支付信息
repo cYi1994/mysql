@@ -1,0 +1,29 @@
+select o.pid,
+				o.tutor_apply_id,
+				o.name,
+				o.grade,
+				o.subject,
+				o.planner_name,
+				o.lesson_num,
+				FROM_UNIXTIME(o.update_time) as '成单时间',
+				o.amount/100 as '金额',
+				o.status,
+				o.out_trade_no,
+				u.user_id,
+				u.user_name,
+				u.telephone_num,
+				case
+					when r.charge_type = 1 then '微信'
+					when r.charge_type = 2 then '支付宝'
+					when r.charge_type = 4 then '银联卡支付'
+				end as '支付方式',
+				r.charge_record_id,
+				r.charge_no
+from series_order o
+join user_online u on u.user_id = o.student_user_id
+left join charge_record r on r.user_id = o.student_user_id
+where u.telephone_num IN (13818979722,
+												13863328460,
+												13109885544)
+	AND o.status = 'SUCCESS'
+	AND o.out_trade_no = r.charge_no
