@@ -1,0 +1,50 @@
+# -- 可改时间
+
+select t.teacher_user_id as '老师ID',
+				u2.user_name as '老师姓名',
+				u2.telephone_num as '老师手机',
+				o.student_user_id as '学生ID',
+				u1.user_name as '学生姓名',
+				u1.telephone_num as '学生手机',
+				o.grade as '学段',
+				o.`subject` as '学科',
+				i.tutor_record_id as '课程ID',
+				from_unixtime(t.start_time) as '上课时间',
+				from_unixtime(t.end_time) as '下课时间',
+				CASE
+					WHEN i.period_confirm = 1 THEN '有效课时'
+					WHEN i.period_confirm = 2 THEN '出现异常'
+					WHEN i.period_confirm = 3 THEN '不足40分钟'
+				END AS '课程结果'
+from tutor_preorder_info i
+left join tutor_record t on t.tutor_record_id = i.tutor_record_id
+left join tutor_preorder p on t.tutor_record_id = p.tutor_record_id
+left join series_order o on p.series_order_id = o.pid
+left join user_online u1 on o.student_user_id = u1.user_id
+left join user_online u2 on t.teacher_user_id = u2.user_id
+where o.status = 'SUCCESS'
+  AND (o.note NOT LIKE '%zyb%')
+  AND (o.name NOT LIKE '%测试%')
+  AND (o.note NOT LIKE '%测试%')
+  AND (o.name NOT LIKE '%test%')
+	AND p.`status` = 'BOOK'
+	AND t.tutor_status > 0
+	AND i.period_confirm not like '%测试%'
+	AND i.period_confirm > 0
+	AND date_format(from_unixtime(i.student_start_time), '%Y-%m-%d') between '2017-07-01' and '2017-07-31'
+	AND o.student_user_id NOT IN (148811250,
+                              141321906,
+                              141321906,
+                              43744461,
+                              250595181,
+                              141321906,
+                              249450013,
+                              250595219,
+                              248444058,
+                              248259226,
+                              251804322,
+                              251804626,
+                              251804835,
+                              251436121,
+                              75462035,
+                              247444506)
