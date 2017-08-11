@@ -1,0 +1,24 @@
+## 分子
+select n1.count, count(*)
+from
+(select count(*) as 'count'
+from crm_call_outcome_record c1
+join
+(select c.customer_number, c.start_time
+from crm_call_outcome_record c
+where c.status = 28
+group by c.customer_number
+having min(c.start_time)) as n
+on c1.customer_number = n.customer_number
+where c1.start_time <= n.start_time
+group by c1.customer_number) as n1
+group by n1.count
+
+
+## 分母
+select n.count, count(*)
+from
+(select count(*) as 'count'
+from crm_call_outcome_record c
+group by c.customer_number) as n
+group by n.count
